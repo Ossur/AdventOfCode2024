@@ -11,7 +11,7 @@ let realData =
     System.IO.File.ReadAllLines
     <| Path.Combine(__SOURCE_DIRECTORY__, "RealInput.txt")
 
-let parseRegex = new Regex("^(\d+) +(\d+)$", RegexOptions.Compiled)
+let parseRegex = new Regex(@"^(\d+) +(\d+)$", RegexOptions.Compiled)
 
 let parseLine line =
     let parsing = parseRegex.Match(line)
