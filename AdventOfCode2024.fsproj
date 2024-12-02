@@ -6,10 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Day1/HistorianHysteria.fs" />
+    <Compile Include="./Utils.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.fs" />
+    <Compile Include="./Day1/HistorianHysteria.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="./Day2/RedNosedReports.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="./Program.fs" />
   </ItemGroup>
 
 </Project>
