@@ -35,24 +35,15 @@ let realDataMultiplicationSumGet () = parse realData |> getMultiplicationSum
 
 let parseAlsoDo (data: string array) : (int64 * int64) seq =
     let parseRegex =
-        new Regex(@"(mul\((\d+),(\d+)\)|don't\(\)|do\(\))", RegexOptions.Compiled)
+        new Regex(@"(mul\((\d+),(\d+)\)|don't\(\).*?($|do\(\)))", RegexOptions.Singleline)
 
     let parseAll (line: string) : (int64 * int64) seq =
         seq {
-            let matches = parseRegex.Matches(line)
-
-            let mutable en = true
+            let matches =
+                parseRegex.Matches(line) |> Seq.filter (_.Groups[1].Value[0..2] >> ((=) "mul"))
 
             for m in matches do
-                match m.Groups[1].Value[2] with
-                | 'l' ->
-                    if en then
-                        yield int64 m.Groups[2].Value, int64 m.Groups[3].Value
-                | 'n' -> en <- false
-                | '(' -> en <- true
-                | e ->
-                    printfn $"{e}"
-                    raise (System.Exception "PROGRAMMING ERROR")
+                yield int64 m.Groups[2].Value, int64 m.Groups[3].Value
 
         }
 
@@ -65,4 +56,5 @@ printfn $"{testDataAlsoDoSum}"
 
 let realDataAlsoDoSum () =
     parseAlsoDo realData |> getMultiplicationSum
-//printfn $"{realDataAlsoDoSum ()}"
+
+printfn $"{realDataAlsoDoSum ()}"
