@@ -15,6 +15,9 @@
     <Compile Include="./Day2/RedNosedReports.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="./Day3/MullItOver.fs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="./Program.fs" />
   </ItemGroup>
 
