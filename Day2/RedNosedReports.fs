@@ -56,5 +56,5 @@ let safeWithDampenerCountInTestData =
 let safeWithDampenerCountInRealData () =
     parsedRealData |> Seq.filter isSafeWithDampener |> Seq.length
 
-printfn $"{safeCountInTestData}"
-printfn $"{safeWithDampenerCountInTestData}"
+//printfn $"{safeCountInTestData}"
+//printfn $"{safeWithDampenerCountInTestData}"
