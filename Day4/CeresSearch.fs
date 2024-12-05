@@ -12,7 +12,6 @@ let (testData, realData) =
 
 // original solution that looked so elegant in my head but is actually insane
 // turns out diagonal lines are not so straight forward...
-// by far the slowest solution in terms of performance...
 let getAllLines (data: string array) =
 
     let length, height = String.length (data[0]), Array.length data
@@ -51,7 +50,7 @@ let getAllLines (data: string array) =
         startingPoints |> List.map getForwardLeaningLine
 
     List.ofArray data
-    @ [ " " ] // for formatting
+    @ [ "  " ] // for formatting
     @ verticalLines
     @ [ "  " ]
     @ backLeaninDiagonalLines
@@ -129,7 +128,7 @@ let countXmasString2 (data: string array) =
     |> List.sum
 
 let countXmasStringTest = countXmasString testData
-let countXmasStringReal () = countXmasString2 realData
+let countXmasStringReal () = countXmasString realData
 
 let countXmasFormTest = countXmasForm testData
 let countXmasFormReal () = countXmasForm realData
