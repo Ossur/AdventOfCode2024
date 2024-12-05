@@ -72,14 +72,13 @@ let sumOfIncorrectOrderedMiddlePages () =
         let t = arr[i]
         arr[i] <- arr[j]
         arr[j] <- t
-        arr
 
     let rec fixIfViolates i j (li: int array) : int array =
         let violates = getNumsThatShouldBeAfter li[j] |> Array.contains li[i]
 
         if violates then
             //let fixedList = List.removeAt i li |> (List.insertAt j li[i])
-            swap i j li |> ignore
+            swap i j li
 
         let maxIdx = (Array.length li) - 1
 
