@@ -56,7 +56,8 @@ let main args =
                 printfn
                     $"The sum of the middle pages from the correctly ordered sets is {run Day5.sumOfCorrectMiddlePages}"
 
-                printfn $" but [part 2]"
+                printfn
+                    $" but the sum of the middlepages from the corrected sets is {run Day5.sumOfIncorrectOrderedMiddlePages}"
 
             | _ -> printfn "¬ I haven't solved this day yet"
 
