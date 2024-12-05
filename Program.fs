@@ -52,6 +52,12 @@ let main args =
                 printfn $"In the puzzle, 'XMAS' appears {run Day4.countXmasStringReal} times"
                 printfn $" but the real XMAS only {run Day4.countXmasFormReal} times"
 
+            | 5 ->
+                printfn
+                    $"The sum of the middle pages from the correctly ordered sets is {run Day5.sumOfCorrectMiddlePages}"
+
+                printfn $" but [part 2]"
+
             | _ -> printfn "¬ I haven't solved this day yet"
 
 

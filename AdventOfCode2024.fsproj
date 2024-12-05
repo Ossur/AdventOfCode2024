@@ -9,6 +9,9 @@
     <Compile Include="./Utils.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="./NewDayTemplate.fsx" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="./Day1/HistorianHysteria.fs" />
   </ItemGroup>
   <ItemGroup>
@@ -21,7 +24,11 @@
     <Compile Include="./Day4/CeresSearch.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="./Day5/PrintQueue.fs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="./Program.fs" />
   </ItemGroup>
 
 </Project>
+
