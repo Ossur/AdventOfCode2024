@@ -1,11 +1,10 @@
-
 open System.Text.RegularExpressions
 open System.IO
 
-let ( testData, realData ) = 
-    let readFile filename = 
-        Path.Combine(__SOURCE_DIRECTORY__, filename) |> System.IO.File.ReadAllLines 
-    ( readFile "TestInput.txt" , readFile "RealInput.txt" ) 
+let data =
+    let readFile filename =
+        Path.Combine(__SOURCE_DIRECTORY__, filename) |> System.IO.File.ReadAllLines
+
+    readFile <| [ "TestInput.txt"; "RealInput.txt" ][1]
 
 let parsingRegex = new Regex("\d+")
-

@@ -2,20 +2,15 @@ module Day5
 
 open System.Text.RegularExpressions
 open System.IO
-open Utils
 
-let (testData, realData) =
+let data =
     let readFile filename =
         Path.Combine(__SOURCE_DIRECTORY__, filename) |> System.IO.File.ReadAllLines
 
-    (readFile "TestInput.txt", readFile "RealInput.txt")
+    readFile <| [ "TestInput.txt"; "RealInput.txt" ][1]
 
 type Pages = { pages: int array; middle: int }
 type Rule = { before: int; after: int }
-
-type RuleOrPages =
-    | IsPages of Pages
-    | IsRule of Rule
 
 let parseInput (dataLines: string array) : (Pages list * Rule list) =
 
@@ -38,8 +33,9 @@ let parseInput (dataLines: string array) : (Pages list * Rule list) =
     |> List.fold listToRuleOrPages ([], [])
 
 
+let (pages, rules) = parseInput data
 
-let makeNumsAfterGetter (rules: Rule list) n =
+let getNumsThatShouldBeAfterN (rules: Rule list) n =
     let numsAfter =
         rules
         |> List.groupBy _.before
@@ -48,37 +44,29 @@ let makeNumsAfterGetter (rules: Rule list) n =
 
     Map.tryFind n numsAfter |> Option.defaultValue [||]
 
-let listHasNoViolation getNumsAfter (arr: int array) =
+let getNumsThatShouldBeAfter = getNumsThatShouldBeAfterN rules
+
+let listHasNoViolation (arr: int array) =
     match Array.length arr with // The head of the list must not be in any of the numbers' numsAfter list
     | 0
     | 1 -> true // empty or single element list cannot violate
-    | _ -> arr[1..] |> Array.forall (getNumsAfter >> Array.contains arr[0] >> not)
+    | _ ->
+        arr[1..]
+        |> Array.forall (getNumsThatShouldBeAfter >> Array.contains arr[0] >> not)
 
-let pageHasNoViolation getNumsAfter p =
+let pageHasNoViolation p =
 
     let lastIdx = (Array.length p.pages) - 1
 
     [| for i in [ 0..lastIdx ] -> p.pages[i..lastIdx] |] // the sublists of nth to last page
-    |> Array.forall (listHasNoViolation getNumsAfter)
+    |> Array.forall listHasNoViolation
 
 let sumOfCorrectMiddlePages () =
-    let pages, rules = parseInput realData
 
-    // create a dictionary of which numbers have to be after a given number
-    let getNumsAfter = makeNumsAfterGetter rules
-
-
-    pages
-    |> List.filter (pageHasNoViolation getNumsAfter)
-    |> List.map _.middle
-    |> List.sum
+    pages |> List.filter pageHasNoViolation |> List.map _.middle |> List.sum
 
 
 let sumOfIncorrectOrderedMiddlePages () =
-    let pages, rules = parseInput realData
-
-    // create a dictionary of which numbers have to be after a given number
-    let getNumsAfter = makeNumsAfterGetter rules
 
     let swap i j (arr: int array) =
         let t = arr[i]
@@ -87,7 +75,7 @@ let sumOfIncorrectOrderedMiddlePages () =
         arr
 
     let rec fixIfViolates i j (li: int array) : int array =
-        let violates = getNumsAfter li[j] |> Array.contains li[i]
+        let violates = getNumsThatShouldBeAfter li[j] |> Array.contains li[i]
 
         if violates then
             //let fixedList = List.removeAt i li |> (List.insertAt j li[i])
@@ -112,7 +100,7 @@ let sumOfIncorrectOrderedMiddlePages () =
 
 
     pages
-    |> List.filter ((pageHasNoViolation getNumsAfter) >> not)
+    |> List.filter (pageHasNoViolation >> not)
     |> List.map correctIncorrectPage
     |> List.map _.middle
     |> List.sum
