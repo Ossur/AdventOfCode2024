@@ -1,8 +1,8 @@
 module Day5
 
 open System.Text.RegularExpressions
-
 open System.IO
+open Utils
 
 let (testData, realData) =
     let readFile filename =
@@ -10,7 +10,7 @@ let (testData, realData) =
 
     (readFile "TestInput.txt", readFile "RealInput.txt")
 
-type Pages = { pages: int list; middle: int }
+type Pages = { pages: int array; middle: int }
 type Rule = { before: int; after: int }
 
 type RuleOrPages =
@@ -21,8 +21,8 @@ let parseInput (dataLines: string array) : (Pages list * Rule list) =
 
     let digitRegex = new Regex("\d+", RegexOptions.Compiled)
 
-    let listToRuleOrPages (accPages: Pages list, accRules: Rule list) (l: int list) =
-        let len = List.length l
+    let listToRuleOrPages (accPages: Pages list, accRules: Rule list) (l: int array) =
+        let len = Array.length l
 
         if ((len % 2) = 0) then
             let newRule = { before = l[0]; after = l[1] }
@@ -34,37 +34,38 @@ let parseInput (dataLines: string array) : (Pages list * Rule list) =
     dataLines
     |> List.ofArray
     |> List.filter (String.length >> (=) 0 >> not)
-    |> List.map (fun x -> [ for m in (digitRegex.Matches(x)) -> m.Value |> int ])
+    |> List.map (fun x -> [| for m in (digitRegex.Matches(x)) -> m.Value |> int |])
     |> List.fold listToRuleOrPages ([], [])
 
 
 
-let getNumsAfterGetter (rules: Rule list) n =
+let makeNumsAfterGetter (rules: Rule list) n =
     let numsAfter =
         rules
         |> List.groupBy _.before
-        |> List.map (fun (k, rules) -> (k, rules |> List.map (fun rule -> rule.after)))
+        |> List.map (fun (k, rules) -> (k, rules |> List.map (fun rule -> rule.after) |> Array.ofList))
         |> Map.ofList
 
-    Map.tryFind n numsAfter |> Option.defaultValue []
+    Map.tryFind n numsAfter |> Option.defaultValue [||]
 
-let listHasNoViolation getNumsAfter list =
-    match list with // The head of the list must not be in any of the numbers' numsAfter list
-    | h :: t -> t |> List.forall (getNumsAfter >> List.contains h >> not)
-    | _ -> true // empty or single element list cannot violate
+let listHasNoViolation getNumsAfter (arr: int array) =
+    match Array.length arr with // The head of the list must not be in any of the numbers' numsAfter list
+    | 0
+    | 1 -> true // empty or single element list cannot violate
+    | _ -> arr[1..] |> Array.forall (getNumsAfter >> Array.contains arr[0] >> not)
 
 let pageHasNoViolation getNumsAfter p =
 
-    let lastIdx = (List.length p.pages) - 1
+    let lastIdx = (Array.length p.pages) - 1
 
-    [ for i in [ 0..lastIdx ] -> p.pages[i..lastIdx] ] // the sublists of nth to last page
-    |> List.forall (listHasNoViolation getNumsAfter)
+    [| for i in [ 0..lastIdx ] -> p.pages[i..lastIdx] |] // the sublists of nth to last page
+    |> Array.forall (listHasNoViolation getNumsAfter)
 
 let sumOfCorrectMiddlePages () =
     let pages, rules = parseInput realData
 
     // create a dictionary of which numbers have to be after a given number
-    let getNumsAfter = getNumsAfterGetter rules
+    let getNumsAfter = makeNumsAfterGetter rules
 
 
     pages
@@ -73,41 +74,41 @@ let sumOfCorrectMiddlePages () =
     |> List.sum
 
 
-let printlist li =
-    for i in li do
-        printfn $"{i}"
-
-    li
-
 let sumOfIncorrectOrderedMiddlePages () =
     let pages, rules = parseInput realData
 
     // create a dictionary of which numbers have to be after a given number
-    let getNumsAfter = getNumsAfterGetter rules
+    let getNumsAfter = makeNumsAfterGetter rules
 
-    let rec fixIfViolates i j (li: int list) =
-        let violates = getNumsAfter li[j] |> List.contains li[i]
+    let swap i j (arr: int array) =
+        let t = arr[i]
+        arr[i] <- arr[j]
+        arr[j] <- t
+        arr
+
+    let rec fixIfViolates i j (li: int array) : int array =
+        let violates = getNumsAfter li[j] |> Array.contains li[i]
 
         if violates then
-            let fixedList = List.removeAt i li |> (List.insertAt j li[i])
-            fixIfViolates i (j - 1) fixedList
-        else
-            let maxIdx = (List.length li) - 1
+            //let fixedList = List.removeAt i li |> (List.insertAt j li[i])
+            swap i j li |> ignore
 
-            if j = maxIdx then
-                if i = (maxIdx - 1) then // last iteration
-                    li
-                else
-                    fixIfViolates (i + 1) (i + 2) li
+        let maxIdx = (Array.length li) - 1
+
+        if j = maxIdx then
+            if i = (maxIdx - 1) then // last iteration
+                li
             else
-                fixIfViolates i (j + 1) li
+                fixIfViolates (i + 1) (i + 2) li
+        else
+            fixIfViolates i (j + 1) li
 
 
     let correctIncorrectPage (p: Pages) =
         let fixedPages = fixIfViolates 0 1 p.pages
 
         { pages = fixedPages
-          middle = fixedPages[(List.length fixedPages) / 2] }
+          middle = fixedPages[(Array.length fixedPages) / 2] }
 
 
     pages
