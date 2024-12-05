@@ -4,13 +4,10 @@ module Day3
 open System.Text.RegularExpressions
 open System.IO
 
-let testData =
-    System.IO.File.ReadAllLines
-    <| Path.Combine(__SOURCE_DIRECTORY__, "TestInput.txt")
-
-let realData =
-    System.IO.File.ReadAllLines
-    <| Path.Combine(__SOURCE_DIRECTORY__, "RealInput.txt")
+let ( testData, realData ) = 
+    let readFile filename = 
+        Path.Combine(__SOURCE_DIRECTORY__, filename) |> System.IO.File.ReadAllLines 
+    ( readFile "TestInput.txt" , readFile "RealInput.txt" ) 
 
 
 let parse (data: string array) : (int64 * int64) seq =
@@ -30,7 +27,6 @@ let getMultiplicationSum = Seq.fold (fun a (n1, n2) -> a + (n1 * n2)) 0L
 let testDataMultiplicationSum = parse testData |> getMultiplicationSum
 
 let realDataMultiplicationSumGet () = parse realData |> getMultiplicationSum
-// printfn $"{realDataMultiplicationSum ()}"
 
 let parseAlsoDo (data: string array) : (int64 * int64) seq =
     let parseRegex =
@@ -46,9 +42,7 @@ let parseAlsoDo (data: string array) : (int64 * int64) seq =
 
 
 let testDataAlsoDoSum = parseAlsoDo testData |> getMultiplicationSum
-printfn $"{testDataAlsoDoSum}"
 
 let realDataAlsoDoSum () =
     parseAlsoDo realData |> getMultiplicationSum
 
-//printfn $"{realDataAlsoDoSum ()}"

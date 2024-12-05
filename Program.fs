@@ -1,36 +1,68 @@
 ﻿// For more information see https://aka.ms/fsharp-console-apps
 module Program
 
+open System.Diagnostics
 open System.Text.RegularExpressions
 open System
 
-open Day1
-
 [<EntryPoint>]
-let main _ =
-    printfn $"Merry christmas! Press a number to run a day in the advent calendar!"
+let main args =
+
     let inputRegex = new Regex(".*(\d+).*", RegexOptions.Compiled)
 
-    let rec repl () =
-        let matching = Console.ReadLine() |> inputRegex.Match
+    // run a function with some very naive/basic performance metrics
+    let run f =
+        let getMemory () =
+            let proc = Process.GetCurrentProcess()
+            proc.WorkingSet64 / 1024L / 1024L
+
+        System.GC.Collect()
+        let memBefore = getMemory ()
+        let sw = Stopwatch.StartNew()
+        let result = f ()
+        sw.Stop()
+        let memAfter = getMemory ()
+        printfn "Time: %f ms, Memory: %d MB" sw.Elapsed.TotalMilliseconds (memAfter - memBefore)
+        result
+
+    let printSolution arg =
+
+        let matching = inputRegex.Match arg
 
         if not matching.Success then
             printfn "Please input a number!"
         else
-            match matching.Groups[1].Value |> int with
+            let dayNum = matching.Groups[1].Value |> int
+            printfn $"Running day {dayNum}"
+
+            match dayNum with
             | 1 ->
-                let part1, part2 = Day1.realdataDistanceGet (), Day1.realDataSimilarityGet ()
-                printfn $"The total distance between the lists was {part1}, but the similarity was {part2}"
+                printfn $"The total distance between the lists was {run Day1.realdataDistanceGet},"
+                printfn $" but the similarity was {run Day1.realDataSimilarityGet}"
+
             | 2 ->
-                let part1, part2 = Day2.safeCountInRealDataGet (), Day2.safeWithDampenerCountInRealData ()
-                printfn $"The total number of safe reports are {part1}, but with the problem dampener they are {part2}"
+                printfn $"The total number of safe reports are {run Day2.safeCountInRealDataGet},"
+                printfn $" but with the problem dampener they are {run Day2.safeWithDampenerCountInRealData}"
+
             | 3 ->
-                let part1, part2 = Day3.realDataMultiplicationSumGet (), Day3.realDataAlsoDoSum ()
-                printfn $"The sum of the multiplication results from the corrupted memory instructions are
-                {part1}, but with taking enable instructions into account it is only {part2}"
-            | _ -> printfn "I haven't solved this day yet"
+                printfn $"The sum of the multiplication results are {run Day3.realDataMultiplicationSumGet}, "
+                printfn $" but with taking enable instructions into account it is only {run Day3.realDataAlsoDoSum}"
 
-        repl()
+            | 4 ->
+                printfn $"In the puzzle, 'XMAS' appears {run Day4.countXmasStringReal} times"
+                printfn $" but the real XMAS only {run Day4.countXmasFormReal} times"
 
-    repl()
+            | _ -> printfn "¬ I haven't solved this day yet"
+
+
+    let rec repl () =
+        Console.ReadLine() |> printSolution
+        repl ()
+
+    match Array.length args with
+    | 0 ->
+        printfn $"Merry christmas! Press a number to run a day in the advent calendar!"
+        repl ()
+    | _ -> printSolution args[0]
+
     0

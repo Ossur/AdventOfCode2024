@@ -18,6 +18,9 @@
     <Compile Include="./Day3/MullItOver.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="./Day4/CeresSearch.fs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="./Program.fs" />
   </ItemGroup>
 
