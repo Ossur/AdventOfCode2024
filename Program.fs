@@ -61,7 +61,9 @@ let main args =
             | 6 ->
                 printfn $"The guard visited {run Day6.quantityOfVisits}"
 
-                printfn $" but ??? [not yet solved]"
+                printfn
+                    $" but there are obstacle possiblilities at {run Day6.obstructionPossibilities} places on the
+                map"
 
             | _ -> printfn "¬ I haven't solved this day yet"
 
