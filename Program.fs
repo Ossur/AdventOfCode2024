@@ -58,6 +58,10 @@ let main args =
 
                 printfn
                     $" but the sum of the middlepages from the corrected sets is {run Day5.sumOfIncorrectOrderedMiddlePages}"
+            | 6 ->
+                printfn $"The guard visited {run Day6.quantityOfVisits}"
+
+                printfn $" but ??? [not yet solved]"
 
             | _ -> printfn "¬ I haven't solved this day yet"
 

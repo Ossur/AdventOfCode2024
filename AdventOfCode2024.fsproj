@@ -27,8 +27,13 @@
     <Compile Include="./Day5/PrintQueue.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="./Day6/GuardGallivant.fs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="./Program.fs" />
   </ItemGroup>
 
 </Project>
+
+
 
