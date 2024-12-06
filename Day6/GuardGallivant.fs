@@ -8,7 +8,7 @@ let data =
     let readFile filename =
         Path.Combine(__SOURCE_DIRECTORY__, filename) |> System.IO.File.ReadAllLines
 
-    readFile <| [ "TestInput.txt"; "RealInput.txt" ][0]
+    readFile <| [ "TestInput.txt"; "RealInput.txt" ][1]
 
 let print = false
 
@@ -20,9 +20,12 @@ type Direction =
     | Left
     | Right
 
+
 type Guard =
     { Coords: int * int
-      Turning: Direction }
+      Turning: Direction
+      Steps: System.Collections.Generic.HashSet<(Direction * (int * int))> }
+
 
 let getDirChar d =
     match d with
@@ -31,17 +34,22 @@ let getDirChar d =
     | Left -> '<'
     | Right -> '>'
 
+let getDirection d =
+    match d with
+    | '^' -> Up
+    | 'v' -> Down
+    | '<' -> Left
+    | '>' -> Right
+    | _ -> failwith $"{d} is not a guard character!"
+
 let isGuardCharacter c =
     Array.contains c [| '^'; '>'; 'v'; '<' |]
 
 
 let toGuard (c, coords) =
-    match c with
-    | '^' -> { Coords = coords; Turning = Up }
-    | '>' -> { Coords = coords; Turning = Right }
-    | 'v' -> { Coords = coords; Turning = Down }
-    | '<' -> { Coords = coords; Turning = Left }
-    | _ -> failwith $"{c} is not a guard character!"
+    { Steps = new System.Collections.Generic.HashSet<(Direction * (int * int))>()
+      Turning = getDirection c
+      Coords = coords }
 
 
 let getGuard map =
@@ -55,10 +63,11 @@ let turnRight dir =
     | Left -> Up
 
 let turnGuard g =
-    let { Turning = dir; Coords = c } = g
+    g.Steps.Add(g.Turning, g.Coords) |> ignore
 
-    { Turning = (turnRight dir)
-      Coords = c }
+    { Turning = turnRight g.Turning
+      Steps = g.Steps
+      Coords = g.Coords }
 
 
 let getCoordsInFront { Turning = dir; Coords = (i, j) } =
@@ -68,42 +77,33 @@ let getCoordsInFront { Turning = dir; Coords = (i, j) } =
     | Down -> i + 1, j
     | Left -> i, j - 1
 
-let getCoordsRightBehind { Turning = dir; Coords = (i, j) } =
-    match dir with
-    | Up -> i + 1, j + 1
-    | Right -> i - 1, j + 1
-    | Down -> i - 1, j - 1
-    | Left -> i - 1, j + 1
 
-let getCoordBehind { Turning = dir; Coords = (i, j) } =
-    match dir with
-    | Up -> i + 1, j
-    | Right -> i, j - 1
-    | Down -> i - 1, j
-    | Left -> i, j + 1
-
-
-let moveGuard g map pathmark =
-    let currentCoords & (ci, cj) = g.Coords
+let moveGuard g map =
     let nextCoords & (ni, nj) = getCoordsInFront g
 
     if (isWithinBounds map nextCoords) && map.Array[ni, nj] = '#' then
         turnGuard g
     else
-        map.Array[ci, cj] <- pathmark g map
+        g.Steps.Add(g.Turning, g.Coords) |> ignore
 
         { Turning = g.Turning
-          Coords = nextCoords }
+          Coords = nextCoords
+          Steps = g.Steps }
 
 
-let rec moveUntilOutOfMap g map pathmark =
+// returns true if moved out of the map
+// returns false if in a loop
+let rec moveUntilOutOfMap g map =
 
-    let guardAfterNextStep = moveGuard g map pathmark
+    let guardAfterNextStep = moveGuard g map
 
     if isWithinBounds map guardAfterNextStep.Coords |> not then
-        ()
+        true, guardAfterNextStep
+    else if g.Steps.Contains((guardAfterNextStep.Turning, guardAfterNextStep.Coords)) then
+        false, guardAfterNextStep
     else
-        moveUntilOutOfMap guardAfterNextStep map pathmark
+        moveUntilOutOfMap guardAfterNextStep map
+
 
 let quantityOfVisits () =
 
@@ -113,15 +113,23 @@ let quantityOfVisits () =
         printArray2D map
         printfn "¬¬¬¬¬¬¬¬¬¬¬¬"
 
-    let guard = getGuard map
-
-    moveUntilOutOfMap guard map (fun _ _ -> 'X')
+    let movedOut, guard = moveUntilOutOfMap (getGuard map) map
 
     if print then
         printArray2D map
 
-    map.Array |> array2dFilterIj ((=) 'X') |> List.length
+    if not movedOut then
+        -1
+    else
+        guard.Steps
+        |> List.ofSeq
+        |> List.map (fun (_, c) -> c)
+        |> List.distinct
+        |> List.length
 
+// DOESNT WORK
+// TODO try to run simulation with an obstacle added on each part of the path, count the steps and once the
+// steps reach 10000000 just assume it is good enough for that version of the map
 let obstructionPossibilities () =
 
     let map = asArray2D data
@@ -130,25 +138,32 @@ let obstructionPossibilities () =
         printArray2D map
         printfn "¬¬¬¬¬¬¬¬¬¬¬¬"
 
-    let guard = getGuard map
+    let guardStart = getGuard map
+    let movedOut, guard = moveUntilOutOfMap guardStart map
 
-    let chooseMark g map =
+    if not movedOut then
+        failwith "Something wrong, map doesn't have a path out"
 
-        let ci, cj = g.Coords
-        let ri, rj = getCoordsRightBehind g
-        let bi, bj = getCoordBehind g
-        let markToTheRightBehind = map.Array[ri, rj]
-        let currentMark = map.Array[ci, cj]
-        let markBehind = map.Array[bi, bj]
+    let stepQuanity = guard.Steps.Count
 
-        if
-            (markBehind = (getDirChar g.Turning)
-             && markToTheRightBehind = (g.Turning |> turnRight |> getDirChar))
-        then
-            'O'
-        else
-            getDirChar g.Turning
+    let possibleObstructions =
+        guard.Steps
+        //|> List.removeAt (stepQuanity - 1)
+        //|> List.tail
+        |> List.ofSeq
+        |> List.map (fun (_, c) -> c)
+        |> List.filter ((<>) guardStart.Coords)
+        |> List.distinct
 
-    moveUntilOutOfMap guard map chooseMark
 
-    map.Array |> array2dFilterIj ((=) 'O') |> List.length
+    //let mutable c = 0
+
+    let doesObstructEndInGuardLoop (ci, cj) =
+        //c <- c + 1
+        //printfn $"Trying obstruct at {ci},{cj}, {c}th placement to try"
+        map.Array[ci, cj] <- '#'
+        let movedOut, _ = moveUntilOutOfMap (getGuard map) map
+        map.Array[ci, cj] <- '.'
+        not movedOut
+
+    possibleObstructions |> List.filter doesObstructEndInGuardLoop |> List.length
