@@ -30,10 +30,14 @@
     <Compile Include="./Day6/GuardGallivant.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="./Day7/BridgeRepair.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="./Day8/ResonantCollinearity.fs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="./Program.fs" />
   </ItemGroup>
 
 </Project>
-
-
 

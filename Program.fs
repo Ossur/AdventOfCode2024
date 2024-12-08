@@ -59,12 +59,15 @@ let main args =
                 printfn
                     $" but the sum of the middlepages from the corrected sets is {run Day5.sumOfIncorrectOrderedMiddlePages}"
             | 6 ->
-                printfn $"The guard visited {run Day6.quantityOfVisits}"
+                printfn $"The guard visited {run Day6.quantityOfVisits} places"
 
                 printfn
                     $" but there are obstacle possiblilities at {run Day6.obstructionPossibilities} places on the
                 map"
 
+            | 7 -> printfn $"{run Day7.totalCalibrationResult}"
+
+            | 8 -> printfn $"The total number of anitondes is {run Day8.antinodeQuanity}"
             | _ -> printfn "¬ I haven't solved this day yet"
 
 
