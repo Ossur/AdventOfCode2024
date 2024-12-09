@@ -47,8 +47,6 @@ let printArray2D (arr: Array2DWithMetadata<char>) =
         let s = [| for i in [ 0 .. (arr.Width - 1) ] -> arr.Array[j, i] |] |> String
         printfn $"{s}"
 
-
-
 let array2dFilterIj (predicate: 'a -> bool) (arr: 'a array2d) : ('a * (int * int)) list =
     let w, h = Array2D.length2 arr, Array2D.length1 arr
 

@@ -30,16 +30,25 @@
     <Compile Include="./Day6/GuardGallivant.fs" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <Compile Include="./Day7/BridgeRepair.fs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="./Day8/ResonantCollinearity.fs" />
-  </ItemGroup>
-  <ItemGroup>
+=======
     <Compile Include="./Day9/DiskFragmenter.fs" />
+>>>>>>> 27120c7 (Day 9 start)
   </ItemGroup>
   <ItemGroup>
     <Compile Include="./Program.fs" />
   </ItemGroup>
 
 </Project>
+
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> 27120c7 (Day 9 start)

@@ -3,6 +3,7 @@ module Day6
 open System.Text.RegularExpressions
 open System.IO
 open Utils
+open System.Collections.Generic
 
 let data =
     let readFile filename =
@@ -10,7 +11,8 @@ let data =
 
     readFile <| [ "TestInput.txt"; "RealInput.txt" ][1]
 
-let print = false
+let printMaps = false
+let printProgress = false
 
 let parsingRegex = new Regex("\d+")
 
@@ -24,7 +26,9 @@ type Direction =
 type Guard =
     { Coords: int * int
       Turning: Direction
-      Steps: System.Collections.Generic.HashSet<(Direction * (int * int))> }
+      // optimization that turns minutes into seconds, with list solution takes over 10 mins
+      Steps: HashSet<(Direction * (int * int))> }
+
 
 
 let getDirChar d =
@@ -47,7 +51,7 @@ let isGuardCharacter c =
 
 
 let toGuard (c, coords) =
-    { Steps = new System.Collections.Generic.HashSet<(Direction * (int * int))>()
+    { Steps = new HashSet<(Direction * (int * int))>()
       Turning = getDirection c
       Coords = coords }
 
@@ -109,13 +113,13 @@ let quantityOfVisits () =
 
     let map = asArray2D data
 
-    if print then
+    if printMaps then
         printArray2D map
         printfn "¬¬¬¬¬¬¬¬¬¬¬¬"
 
     let movedOut, guard = moveUntilOutOfMap (getGuard map) map
 
-    if print then
+    if printMaps then
         printArray2D map
 
     if not movedOut then
@@ -134,7 +138,7 @@ let obstructionPossibilities () =
 
     let map = asArray2D data
 
-    if print then
+    if printMaps then
         printArray2D map
         printfn "¬¬¬¬¬¬¬¬¬¬¬¬"
 
@@ -144,26 +148,26 @@ let obstructionPossibilities () =
     if not movedOut then
         failwith "Something wrong, map doesn't have a path out"
 
-    let stepQuanity = guard.Steps.Count
-
     let possibleObstructions =
         guard.Steps
-        //|> List.removeAt (stepQuanity - 1)
-        //|> List.tail
         |> List.ofSeq
         |> List.map (fun (_, c) -> c)
         |> List.filter ((<>) guardStart.Coords)
         |> List.distinct
 
 
-    //let mutable c = 0
+    let mutable c = 0
 
     let doesObstructEndInGuardLoop (ci, cj) =
-        //c <- c + 1
-        //printfn $"Trying obstruct at {ci},{cj}, {c}th placement to try"
+
         map.Array[ci, cj] <- '#'
         let movedOut, _ = moveUntilOutOfMap (getGuard map) map
         map.Array[ci, cj] <- '.'
+
+        if printProgress then
+            c <- c + 1
+            printfn $"Trying obstruct at {ci},{cj}, {c}th placement to try - does it loop?? {not movedOut}"
+
         not movedOut
 
     possibleObstructions |> List.filter doesObstructEndInGuardLoop |> List.length

@@ -62,8 +62,7 @@ let main args =
                 printfn $"The guard visited {run Day6.quantityOfVisits} places"
 
                 printfn
-                    $" but there are obstacle possiblilities at {run Day6.obstructionPossibilities} places on the
-                map"
+                    $" but there are obstacle possiblilities at {run Day6.obstructionPossibilities} places on the map"
 
             | 7 -> printfn $"{run Day7.totalCalibrationResult}"
 
