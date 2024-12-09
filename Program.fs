@@ -67,6 +67,11 @@ let main args =
             | 7 -> printfn $"{run Day7.totalCalibrationResult}"
 
             | 8 -> printfn $"The total number of anitondes is {run Day8.antinodeQuanity}"
+            | 9 ->
+                printfn $"The checksum for the rearranged disk is {run Day9.getChecksumOfRearranged}"
+
+                printfn
+                    $"  but the checksum for the unfragmented is is {run Day9.getChecksumOfRearrangedWithoutFragmentation}"
             | _ -> printfn "¬ I haven't solved this day yet"
 
 
