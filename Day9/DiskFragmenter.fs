@@ -105,9 +105,9 @@ let compressAndGetChecksum compressionAlgo =
     parseAndExpandDiskMap ()
     |> compressionAlgo
     |> Array.map (max 0) // change the -1 to 0 for the multiplication
-    |> Array.map bigint
-    |> Array.mapi (bigint >> (*))
+    |> Array.mapi (fun i num -> (bigint i) * (bigint num))
     |> Array.sum
+
 
 let getChecksumOfRearranged () = compressAndGetChecksum compressFully
 
