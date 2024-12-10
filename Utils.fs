@@ -41,6 +41,23 @@ let getAllPossiblePairings indexedCollection =
           for j in [ i + 1 .. maxIdx ] do
               yield indexedCollection[i], indexedCollection[j] ]
 
+let rec getCombinations uniquePicks combinationLength pool =
+
+
+    match combinationLength with
+    | 1 -> pool |> List.map (fun x -> [ x ])
+    | _ ->
+        pool
+        |> List.collect (fun x ->
+            getCombinations
+                uniquePicks
+                (combinationLength - 1)
+                (if uniquePicks then
+                     (List.removeAt (List.findIndex ((=) x) pool) pool)
+                 else
+                     pool)
+            |> List.map (fun c -> x :: c))
+
 
 let printArray2D (arr: Array2DWithMetadata<char>) =
     for j in [ 0 .. (arr.Height - 1) ] do

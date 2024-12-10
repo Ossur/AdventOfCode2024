@@ -15,6 +15,7 @@ let parsingRegex = new Regex("\d+")
 
 
 
+
 let parseLine l =
     let parsedValues = parsingRegex.Matches l |> List.ofSeq |> List.map (_.Value >> int)
 
@@ -22,7 +23,9 @@ let parseLine l =
         failwith "Unexpected empty line"
 
     let a :: b = parsedValues
-    {| Testcase = a; Operands = b |}
+    {| Testcase = a; OperandsAsc = b |> List.sort |> Array.ofList  |}
+
+// because the operands are ascending, the smallest result will be for sums, the next smallest for  *,+,...,+
 
 
 let totalCalibrationResult () =

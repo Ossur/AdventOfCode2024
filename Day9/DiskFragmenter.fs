@@ -85,11 +85,11 @@ let compressWithoutFragmentation (disk: int array) =
             match disk[spaceIdxEnd], disk[blockIdxStart] with
             | -1, -1 -> moveBlockIfPossible spaceIdxStart (blockIdxStart - 1)
             | -1, _ ->
-                let blockLen = blockIdxEnd - blockIdxStart
-                let spaceLen = spaceIdxEnd - spaceIdxStart
+                let blockLen = blockIdxEnd - blockIdxStart - 1
+                let spaceLen = spaceIdxEnd - spaceIdxStart - 1
 
                 if spaceLen >= blockLen then
-                    let movedSpaceIdxEnd = spaceIdxStart + blockLen
+                    let movedSpaceIdxEnd = spaceIdxStart + blockLen + 1
                     swapRange (spaceIdxStart, movedSpaceIdxEnd) (blockIdxStart, blockIdxEnd)
                     moveBlockIfPossible 0 (blockIdxStart - 1)
                 else
@@ -100,14 +100,12 @@ let compressWithoutFragmentation (disk: int array) =
 
     moveBlockIfPossible 0 ((Array.length disk) - 1)
 
-
 let compressAndGetChecksum compressionAlgo =
     parseAndExpandDiskMap ()
     |> compressionAlgo
     |> Array.map (max 0) // change the -1 to 0 for the multiplication
     |> Array.mapi (fun i num -> (bigint i) * (bigint num))
     |> Array.sum
-
 
 let getChecksumOfRearranged () = compressAndGetChecksum compressFully
 
