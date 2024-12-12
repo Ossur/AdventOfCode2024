@@ -39,7 +39,9 @@
     <Compile Include="./Day9/DiskFragmenter.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="./Day11/PlutonianPebbles.fs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="./Program.fs" />
   </ItemGroup>
 </Project>
-

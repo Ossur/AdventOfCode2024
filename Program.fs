@@ -8,7 +8,7 @@ open System
 [<EntryPoint>]
 let main args =
 
-    let inputRegex = new Regex(".*(\d+).*", RegexOptions.Compiled)
+    let inputRegex = new Regex(".*?(\d+).*?", RegexOptions.Compiled)
 
     // run a function with some very naive/basic performance metrics
     let run f =
@@ -66,14 +66,17 @@ let main args =
 
             | 7 -> printfn $"{run Day7.totalCalibrationResult}"
 
-            | 8 -> printfn $"The total number of anitondes is {run Day8.antinodeQuanity}"
-                   printfn $"  but the actual number of antidoes is { run Day8.antinodeQuanity2}"
+            | 8 ->
+                printfn $"The total number of anitondes is {run Day8.antinodeQuanity}"
+                printfn $"  but the actual number of antidoes is {run Day8.antinodeQuanity2}"
 
             | 9 ->
                 printfn $"The checksum for the rearranged disk is {run Day9.getChecksumOfRearranged}"
 
                 printfn
                     $"  but the checksum for the unfragmented is is {run Day9.getChecksumOfRearrangedWithoutFragmentation}"
+            | 11 -> printfn $"Quantity of stones after 25 blinks are {run Day11.quantityOfStones}"
+
             | _ -> printfn "¬ I haven't solved this day yet"
 
 

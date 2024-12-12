@@ -1,6 +1,7 @@
 module Utils
 
 open System
+open System.Collections.Generic
 
 let printlist li =
     for i in li do
@@ -71,3 +72,22 @@ let array2dFilterIj (predicate: 'a -> bool) (arr: 'a array2d) : ('a * (int * int
           for j in [ 0 .. (w - 1) ] do
               if predicate arr[i, j] then
                   yield (arr[i, j], (i, j)) ]
+
+let asNodeSequence (list: LinkedList<'T>) : LinkedListNode<'T> seq =
+    let iterate (node: LinkedListNode<'T>) =
+        if node <> null then Some(node, node.Next) else None
+
+    list.First |> Seq.unfold iterate
+
+let collect (mapping: 'T -> 'T array) (list: LinkedList<'T>) =
+    for n in (asNodeSequence list) do
+        match mapping n.Value with
+        | [||] -> list.Remove(n)
+        | [| a |] -> n.Value <- a
+        | vals ->
+            n.Value <- vals[vals.Length - 1]
+
+            vals[0 .. vals.Length - 2]
+            |> Array.iter (fun x -> list.AddBefore(n, x) |> ignore)
+
+    list
