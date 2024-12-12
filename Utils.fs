@@ -9,6 +9,11 @@ let printlist li =
 
     li
 
+let printmap (m: Dictionary<'k, 'v>) =
+    for k in m.Keys do
+        printfn "%A %A" k m[k]
+
+
 type Array2DWithMetadata<'T> =
     { Array: 'T array2d
       Height: int

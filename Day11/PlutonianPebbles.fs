@@ -30,6 +30,10 @@ let rec stonesAfterBlinking (stones: LinkedList<uint64>) blinks =
         (asNodeSequence stones |> Seq.iter blink) |> ignore
         stonesAfterBlinking stones (blinks - 1)
 
+let quantityOfStonesOld () =
+    let li = data |> List.map uint64 |> (fun x -> new LinkedList<uint64>(x))
+    stonesAfterBlinking li 40 |> _.Count
+
 let resultCache: Dictionary<(int * bigint), bigint> =
     new Dictionary<(int * bigint), bigint>()
 
@@ -59,11 +63,7 @@ let rec countStonesAfterBlinks blinks stone =
             count
 
 
+let quantityOfStonesNew () =
+    data |> List.map bigint |> List.map (countStonesAfterBlinks 1000) |> List.sum
 
-
-let quantityOfStonesOld () =
-    let li = data |> List.map uint64 |> (fun x -> new LinkedList<uint64>(x))
-    stonesAfterBlinking li 25 |> _.Count
-
-let quantityOfStones () =
-    data |> List.map bigint |> List.map (countStonesAfterBlinks 75) |> List.sum
+let quantityOfStones = quantityOfStonesNew
