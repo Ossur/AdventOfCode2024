@@ -78,7 +78,9 @@ let main args =
 
             | 11 -> printfn $"Quantity of stones after 25 blinks are {run Day11.quantityOfStones}"
 
-            | 12 -> printfn $"The total price for fences is {run Day12.getTotalFencePrice}"
+            | 12 ->
+                printfn $"The total price for fences is {run Day12.getTotalFencePrice}"
+                printfn $"but with discount it is {run Day12.getDiscountedFencePrice}"
 
             | _ -> printfn "¬ I haven't solved this day yet"
 

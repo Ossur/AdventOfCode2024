@@ -40,6 +40,17 @@ let asArray2D (strings: string array) =
 let isWithinBounds arr (i, j) =
     i >= 0 && arr.Width > i && j >= 0 && arr.Height > j
 
+
+
+// Filter, but returns a tuple of the list of true and false evaluated values
+// Returns: (truelist, falselist)
+let filter2 predicate (s: 'a seq) : ('a list * 'a list) =
+    let accumulate (accT, accF) i =
+        if predicate i then i :: accT, accF else accT, i :: accF
+
+    Seq.fold accumulate ([], []) s
+
+
 let getAllPossiblePairings indexedCollection =
     let maxIdx = (List.length indexedCollection) - 1
 
