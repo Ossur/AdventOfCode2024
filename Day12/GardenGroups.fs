@@ -82,26 +82,19 @@ let getTotalFencePrice () =
     |> Seq.sum
 
 
-let getQtyOfStraightHorizontalLines (plots: PlotSet) =
+let getQtyOfGaplessHorizontalLines plots =
     let isNextInStraightLine (ai, aj) (bi, bj) = ai = bi && (aj + 1) = bj
 
     let rec h plots cnt =
         match plots with
-        | a :: b :: _ ->
-            if isNextInStraightLine a b then
-                h (List.tail plots) cnt
-            else
-                h (List.tail plots) (cnt + 1)
+        | a :: b :: _ -> h (List.tail plots) (if isNextInStraightLine a b then cnt else cnt + 1)
         | [ _ ] -> cnt + 1
         | [] -> cnt
 
     h (plots |> List.ofSeq |> List.sort) 0
 
-let getQtyOfStraightVerticalLines (plots: PlotSet) =
-    plots
-    |> Seq.map (fun (i, j) -> j, i)
-    |> PlotSet
-    |> getQtyOfStraightHorizontalLines
+let getQtyOfGaplessVerticalLines plots =
+    plots |> Seq.map (fun (i, j) -> j, i) |> getQtyOfGaplessHorizontalLines
 
 
 type PlotPairSet = HashSet<(int * int) * (int * int)>
@@ -110,33 +103,25 @@ let calculateDiscountPrice (region: PlotSet) =
     let area = Seq.length region
 
     let areasWithWestFence =
-        region
-        |> Seq.filter (fun (pi, pj) -> region.Contains((pi, pj - 1)) |> not)
-        |> PlotSet
+        region |> Seq.filter (fun (pi, pj) -> region.Contains((pi, pj - 1)) |> not)
 
     let areasWithEastFence =
-        region
-        |> Seq.filter (fun (pi, pj) -> region.Contains((pi, pj + 1)) |> not)
-        |> PlotSet
+        region |> Seq.filter (fun (pi, pj) -> region.Contains((pi, pj + 1)) |> not)
 
     let areasWithNorthFence =
-        region
-        |> Seq.filter (fun (pi, pj) -> region.Contains((pi - 1, pj)) |> not)
-        |> PlotSet
+        region |> Seq.filter (fun (pi, pj) -> region.Contains((pi - 1, pj)) |> not)
 
     let areasWithSouthFence =
-        region
-        |> Seq.filter (fun (pi, pj) -> region.Contains((pi + 1, pj)) |> not)
-        |> PlotSet
+        region |> Seq.filter (fun (pi, pj) -> region.Contains((pi + 1, pj)) |> not)
 
     let verticalSidesCnt =
         [ areasWithEastFence; areasWithWestFence ]
-        |> List.map getQtyOfStraightVerticalLines
+        |> List.map getQtyOfGaplessVerticalLines
         |> List.sum
 
     let horizontalSidesCnt =
         [ areasWithNorthFence; areasWithSouthFence ]
-        |> List.map getQtyOfStraightHorizontalLines
+        |> List.map getQtyOfGaplessHorizontalLines
         |> List.sum
 
 
