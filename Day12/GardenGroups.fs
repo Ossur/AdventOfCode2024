@@ -97,8 +97,6 @@ let getQtyOfGaplessVerticalLines plots =
     plots |> Seq.map (fun (i, j) -> j, i) |> getQtyOfGaplessHorizontalLines
 
 
-type PlotPairSet = HashSet<(int * int) * (int * int)>
-
 let calculateDiscountPrice (region: PlotSet) =
     let area = Seq.length region
 
