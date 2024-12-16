@@ -8,7 +8,7 @@ let data =
     let readFile filename =
         Path.Combine(__SOURCE_DIRECTORY__, filename) |> System.IO.File.ReadAllLines
 
-    readFile <| [ "TestInput.txt"; "RealInput.txt" ][0]
+    readFile <| [ "TestInput.txt"; "RealInput.txt" ][1]
 
 type Regions =
     { Plant: char
@@ -82,96 +82,65 @@ let getTotalFencePrice () =
     |> Seq.sum
 
 
-let getAllAdjacentAndDiagonallyAdjacentPlots (region: PlotSet) = // including fictional plots outside map
-    let getAdjacentPlots (pi, pj) =
-        [ (pi + 1, pj)
-          (pi, pj + 1)
-          (pi - 1, pj)
-          (pi, pj - 1)
-          (pi + 1, pj + 1)
-          (pi - 1, pj + 1)
-          (pi + 1, pj - 1)
-          (pi - 1, pj - 1) ]
+let getQtyOfStraightHorizontalLines (plots: PlotSet) =
+    let isNextInStraightLine (ai, aj) (bi, bj) = ai = bi && (aj + 1) = bj
 
-    region
-    |> Seq.collect getAdjacentPlots
-    |> Seq.filter (region.Contains >> not)
+    let rec h plots cnt =
+        match plots with
+        | a :: b :: _ ->
+            if isNextInStraightLine a b then
+                h (List.tail plots) cnt
+            else
+                h (List.tail plots) (cnt + 1)
+        | [ _ ] -> cnt + 1
+        | [] -> cnt
+
+    h (plots |> List.ofSeq |> List.sort) 0
+
+let getQtyOfStraightVerticalLines (plots: PlotSet) =
+    plots
+    |> Seq.map (fun (i, j) -> j, i)
     |> PlotSet
+    |> getQtyOfStraightHorizontalLines
 
-let isWithinRegion (region: PlotSet) plot =
-    let pi, pj = plot
 
-    let hasPlotLeftOf () =
-        region |> Seq.exists (fun (i, j) -> i = pi && j < pj)
+type PlotPairSet = HashSet<(int * int) * (int * int)>
 
-    let hasPlotRightOf () =
-        region |> Seq.exists (fun (i, j) -> i = pi && j > pj)
-
-    let hasPlotAbove () =
-        region |> Seq.exists (fun (i, j) -> j = pj && i < pi)
-
-    let hasPlotBelow () =
-        region |> Seq.exists (fun (i, j) -> j = pj && i > pi)
-    // note: defining as functions enables lazy loading below
-    hasPlotAbove () && hasPlotBelow () && hasPlotLeftOf () && hasPlotRightOf ()
-
-let getQtyOfStraightLines (plots: PlotSet) =
-
-    let mutable horizCount = 0
-    let mutable lastWasHorizontallyAdj = false
-    let horizonatllySorted = plots |> Seq.sort
-
-    for ((ai, aj), (bi, bj)) in horizonatllySorted |> Seq.pairwise do
-        let isHorizontallyAdj = (ai = bi) && ((aj + 1) = bj)
-
-        match isHorizontallyAdj, lastWasHorizontallyAdj with
-        | true, false ->
-            horizCount <- 1 + horizCount
-            lastWasHorizontallyAdj <- true
-        | false, _ -> lastWasHorizontallyAdj <- false
-        | _, _ -> ()
-
-    let mutable vertiCount = 0
-    let mutable lastWasVerticallyAdj = false
-    let verticallySorted = plots |> Seq.sortBy (fun (i, j) -> j, i)
-
-    for ((ai, aj), (bi, bj)) in (verticallySorted |> Seq.pairwise) do
-        let isVerticallyAdj = (aj = bj) && ((ai + 1) = bi)
-
-        match isVerticallyAdj, lastWasVerticallyAdj with
-        | true, false ->
-            vertiCount <- 1 + vertiCount
-            lastWasVerticallyAdj <- true
-        | false, _ -> lastWasVerticallyAdj <- false
-        | _ -> ()
-
-    printfn
-        "%A\n%A%A\n%A%A"
-        (plots |> List.ofSeq)
-        (horizonatllySorted |> List.ofSeq)
-        horizCount
-        (verticallySorted |> List.ofSeq)
-        vertiCount
-
-    horizCount + vertiCount
-
-let calculateDiscountPrice region =
+let calculateDiscountPrice (region: PlotSet) =
     let area = Seq.length region
 
-    let innerBoundPlots, outerBoundsPlots =
+    let areasWithWestFence =
         region
-        |> getAllAdjacentAndDiagonallyAdjacentPlots
-        |> filter2 (isWithinRegion region)
-
-    let outerSides = outerBoundsPlots |> PlotSet |> getQtyOfStraightLines
-
-    let innerSides =
-        innerBoundPlots
+        |> Seq.filter (fun (pi, pj) -> region.Contains((pi, pj - 1)) |> not)
         |> PlotSet
-        |> getAllAdjacentAndDiagonallyAdjacentPlots
-        |> getQtyOfStraightLines
 
-    let sides = outerSides + innerSides
+    let areasWithEastFence =
+        region
+        |> Seq.filter (fun (pi, pj) -> region.Contains((pi, pj + 1)) |> not)
+        |> PlotSet
+
+    let areasWithNorthFence =
+        region
+        |> Seq.filter (fun (pi, pj) -> region.Contains((pi - 1, pj)) |> not)
+        |> PlotSet
+
+    let areasWithSouthFence =
+        region
+        |> Seq.filter (fun (pi, pj) -> region.Contains((pi + 1, pj)) |> not)
+        |> PlotSet
+
+    let verticalSidesCnt =
+        [ areasWithEastFence; areasWithWestFence ]
+        |> List.map getQtyOfStraightVerticalLines
+        |> List.sum
+
+    let horizontalSidesCnt =
+        [ areasWithNorthFence; areasWithSouthFence ]
+        |> List.map getQtyOfStraightHorizontalLines
+        |> List.sum
+
+
+    let sides = verticalSidesCnt + horizontalSidesCnt
     area * sides
 
 let getDiscountedFencePrice () =
