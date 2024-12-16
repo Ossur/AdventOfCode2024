@@ -73,20 +73,20 @@ let getAllPossiblePairings indexedCollection =
 
 let rec getCombinations uniquePicks combinationLength pool =
 
-
     match combinationLength with
     | 1 -> pool |> List.map (fun x -> [ x ])
     | _ ->
         pool
-        |> List.collect (fun x ->
+        |> List.mapi (fun i x ->
             getCombinations
                 uniquePicks
                 (combinationLength - 1)
                 (if uniquePicks then
-                     (List.removeAt (List.findIndex ((=) x) pool) pool)
+                     (List.removeAt i pool)
                  else
                      pool)
             |> List.map (fun c -> x :: c))
+            |> List.collect id 
 
 
 let printArray2D (arr: Array2DWithMetadata<char>) =
