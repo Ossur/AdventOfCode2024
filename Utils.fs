@@ -24,12 +24,25 @@ type Array2DWithMetadata<'T> =
     member this.Item(i, j) = this.Array[i, j]
 
 
+let sequencesToArray2D (seqArr: 'a seq array) =
+    let arr2D =
+        try
+            array2D seqArr
+        with _ ->
+            failwith "Lines are not all of the same length"
+
+    { Array = arr2D
+      Height = Array2D.length1 arr2D
+      Width = Array2D.length2 arr2D
+      MaxJ = Array2D.length1 arr2D - 1
+      MaxI = Array2D.length2 arr2D - 1 }
+
 let asArray2D (strings: string array) =
     let arr2D =
         try
             array2D strings
         with _ ->
-            failwith "Strings are not all of the same length"
+            failwith "Lines are not all of the same length"
 
     { Array = arr2D
       Height = Array2D.length1 arr2D

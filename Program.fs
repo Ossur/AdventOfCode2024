@@ -81,6 +81,9 @@ let main args =
             | 12 ->
                 printfn $"The total price for fences is {run Day12.getTotalFencePrice}"
                 printfn $"but with discount it is {run Day12.getDiscountedFencePrice}"
+            | 18 -> 
+                printfn $"The minimum number of steps to exit the memory after first 1024 bytes of curruption is
+                {run Day18.minimumNumberOfStepsAfterKilobyte}"
 
             | _ -> printfn "¬ I haven't solved this day yet"
 
