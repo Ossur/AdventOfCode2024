@@ -32,12 +32,14 @@ let parseLine l =
 
 
 
-// because the operands are ascending, the smallest result will be for sums, the next smallest for  *,+,...,+
 let hasSolution calibration =
     let operandQty = List.length calibration.Operands
+    // sorting operands in ascending order to increase the likelyhood of a cache hit
+    // - works only because most of the numbers are low single digit ones
     let operands = calibration.Operands |> List.sort
 
 
+    // TODO: memoize to increase performance
     let calculate operands operators =
         let rec h operands operators acc =
             match operands, operators with
@@ -47,10 +49,6 @@ let hasSolution calibration =
 
         h (List.tail operands) operators operands[0]
 
-    // creates operator possibilites that generate values in a ascending order
-    // Ordering first by number of multiplication and then by how rightward the multiplication is
-    // And because being more rightward means being used on larger numbers (because the operands are also sorted
-    // in ascending order) it means yielding a larger value
     let getOperatorPossibilites n = getCombinations false n [ (+); (*) ]
 
     getOperatorPossibilites (operandQty - 1)
