@@ -9,7 +9,7 @@ let data =
     let readFile filename =
         Path.Combine(__SOURCE_DIRECTORY__, filename) |> System.IO.File.ReadAllLines
 
-    readFile <| [ "TestInput.txt"; "RealInput.txt" ][0]
+    readFile <| [ "TestInput.txt"; "RealInput.txt" ][1]
 
 let parsingRegex = new Regex("\d+")
 
@@ -32,14 +32,11 @@ let parseLine l =
 
 
 
-let hasSolution calibration =
+let hasSolution operators calibration =
     let operandQty = List.length calibration.Operands
-    // sorting operands in ascending order to increase the likelyhood of a cache hit
-    // - works only because most of the numbers are low single digit ones
-    let operands = calibration.Operands |> List.sort
+    let operands = calibration.Operands
 
 
-    // TODO: memoize to increase performance
     let calculate operands operators =
         let rec h operands operators acc =
             match operands, operators with
@@ -49,7 +46,7 @@ let hasSolution calibration =
 
         h (List.tail operands) operators operands[0]
 
-    let getOperatorPossibilites n = getCombinations false n [ (+); (*) ]
+    let getOperatorPossibilites n = getCombinations false n operators
 
     getOperatorPossibilites (operandQty - 1)
     |> List.map (calculate operands)
@@ -59,6 +56,19 @@ let hasSolution calibration =
 
 
 let totalCalibrationResult () =
+    let hasSolution = hasSolution [ (+); (*) ]
+
+    data
+    |> Array.map parseLine
+    |> Array.filter hasSolution
+    |> Array.map _.Testcase
+    |> Array.sum
+
+
+let totalCalibrationResult2 () =
+    let concat a b = $"{a}{b}" |> uint64
+    let hasSolution = hasSolution [ (+); (*); concat ]
+
     data
     |> Array.map parseLine
     |> Array.filter hasSolution

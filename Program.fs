@@ -64,7 +64,7 @@ let main args =
                 printfn
                     $" but there are obstacle possiblilities at {run Day6.obstructionPossibilities} places on the map"
 
-            | 7 -> printfn $"{run Day7.totalCalibrationResult}"
+            | 7 -> printfn $"{run Day7.totalCalibrationResult2}"
 
             | 8 ->
                 printfn $"The total number of anitondes is {run Day8.antinodeQuanity}"
