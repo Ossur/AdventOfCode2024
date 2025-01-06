@@ -23,6 +23,15 @@ type Array2DWithMetadata<'T> =
 
     member this.Item(i, j) = this.Array[i, j]
 
+let printArray2D formatting (arr: Array2DWithMetadata<'a>) =
+    for i in [ 0 .. arr.MaxI ] do
+        for j in [ 0 .. arr.MaxJ ] do
+            printf formatting arr[i, j]
+
+        printfn ""
+
+    arr
+
 
 let sequencesToArray2D (seqArr: 'a seq array) =
     let arr2D =
@@ -49,6 +58,12 @@ let asArray2D (strings: string array) =
       Width = Array2D.length2 arr2D
       MaxJ = Array2D.length1 arr2D - 1
       MaxI = Array2D.length2 arr2D - 1 }
+
+let asIntArray2d (strings: string array) =
+    strings
+    |> Array.map (Seq.map (Char.GetNumericValue >> int))
+    |> sequencesToArray2D
+
 
 let isWithinBounds arr (i, j) =
     i >= 0 && arr.Width > i && j >= 0 && arr.Height > j
@@ -78,21 +93,10 @@ let rec getCombinations uniquePicks combinationLength pool =
     | _ ->
         pool
         |> List.mapi (fun i x ->
-            getCombinations
-                uniquePicks
-                (combinationLength - 1)
-                (if uniquePicks then
-                     (List.removeAt i pool)
-                 else
-                     pool)
+            getCombinations uniquePicks (combinationLength - 1) (if uniquePicks then (List.removeAt i pool) else pool)
             |> List.map (fun c -> x :: c))
-            |> List.collect id 
+        |> List.collect id
 
-
-let printArray2D (arr: Array2DWithMetadata<char>) =
-    for j in [ 0 .. (arr.Height - 1) ] do
-        let s = [| for i in [ 0 .. (arr.Width - 1) ] -> arr.Array[j, i] |] |> String
-        printfn $"{s}"
 
 let array2dFilterIj (predicate: 'a -> bool) (arr: 'a array2d) : ('a * (int * int)) list =
     let w, h = Array2D.length2 arr, Array2D.length1 arr

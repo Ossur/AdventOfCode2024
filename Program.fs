@@ -76,13 +76,17 @@ let main args =
                 printfn
                     $"  but the checksum for the unfragmented is is {run Day9.getChecksumOfRearrangedWithoutFragmentation}"
 
+            | 10 ->
+                printfn $"Sum of all trailhead scores is {run Day10.getTrailheadScores}"
+                printfn $"Sum of all trailhead ratings is {run Day10.getTrailheadRatings}"
             | 11 -> printfn $"Quantity of stones after 25 blinks are {run Day11.quantityOfStones}"
 
             | 12 ->
                 printfn $"The total price for fences is {run Day12.getTotalFencePrice}"
                 printfn $"but with discount it is {run Day12.getDiscountedFencePrice}"
-            | 18 -> 
-                printfn $"The minimum number of steps to exit the memory after first 1024 bytes of curruption is
+            | 18 ->
+                printfn
+                    $"The minimum number of steps to exit the memory after first 1024 bytes of curruption is
                 {run Day18.minimumNumberOfStepsAfterKilobyte}"
 
             | _ -> printfn "¬ I haven't solved this day yet"

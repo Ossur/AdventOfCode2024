@@ -9,7 +9,7 @@ let data =
     let readFile filename =
         Path.Combine(__SOURCE_DIRECTORY__, filename) |> System.IO.File.ReadAllLines
 
-    readFile <| [ "TestInput.txt"; "RealInput.txt" ][1]
+    readFile <| [ "TestInput.txt"; "RealInput.txt" ][0]
 
 let printMaps = false
 let printProgress = false
@@ -114,13 +114,14 @@ let quantityOfVisits () =
     let map = asArray2D data
 
     if printMaps then
-        printArray2D map
+        printArray2D "%A" map |> ignore
         printfn "¬¬¬¬¬¬¬¬¬¬¬¬"
 
     let movedOut, guard = moveUntilOutOfMap (getGuard map) map
 
     if printMaps then
-        printArray2D map
+        printArray2D "%A" map |> ignore
+
 
     if not movedOut then
         -1
@@ -139,7 +140,7 @@ let obstructionPossibilities () =
     let map = asArray2D data
 
     if printMaps then
-        printArray2D map
+        printArray2D "%A" map |> ignore
         printfn "¬¬¬¬¬¬¬¬¬¬¬¬"
 
     let guardStart = getGuard map
